@@ -3,11 +3,9 @@ FROM node:22-bookworm-slim AS builder
 
 WORKDIR /app
 
-RUN npm install -g pnpm@9
-
 COPY package.json src/ ./
-RUN pnpm install --frozen-lockfile
-RUN pnpm run build
+RUN npm install
+RUN npm run build
 
 
 # ── Stage 2: Runtime ─────────────────────────────────────────────────────────
@@ -36,13 +34,14 @@ RUN npx --yes @puppeteer/browsers install chrome-headless-shell@stable \
 
 WORKDIR /app
 
+# Copy built output + only prod node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY start.sh .
 
-RUN chmod +x start.sh
+RUN chmod +x start.sh \
+    && mkdir -p /tmp/renders
 
-RUN mkdir -p /tmp/renders
 ENV PRODUCER_RENDERS_DIR=/tmp/renders
 
 EXPOSE 9847

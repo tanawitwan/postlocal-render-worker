@@ -19,7 +19,7 @@
  */
 
 import { createProducerApp } from "@hyperframes/producer/server";
-import { createConsoleLogger } from "@hyperframes/producer/logger";
+import { createConsoleLogger } from "@hyperframes/producer";
 import { existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 

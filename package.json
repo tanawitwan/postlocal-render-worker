@@ -6,8 +6,9 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
-    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --format=esm --packages=external",
-    "typecheck": "tsc --noEmit"
+    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --format=esm",
+    "typecheck": "tsc --noEmit",
+    "postinstall": "npm run build"
   },
   "dependencies": {
     "@hyperframes/engine": "^0.4.23",
