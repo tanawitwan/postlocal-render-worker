@@ -1,11 +1,10 @@
 [railway]
-  service = "render-worker"
-  dockerfile = "render-worker/Dockerfile"
+dockerfile = "render-worker/Dockerfile"
 
 [railway.service]
-  minWorkers = 1
-  maxWorkers = 2
+minWorkers = 1
+maxWorkers = 2
 
 [railway.environment]
-  PRODUCER_MAX_CONCURRENT_RENDERS = "1"  # Memory constraint: 1 concurrent render per instance
-  LOG_LEVEL = "info"
+PRODUCER_MAX_CONCURRENT_RENDERS = "1"
+LOG_LEVEL = "info"
