@@ -3,7 +3,8 @@ FROM node:22-bookworm-slim AS builder
 
 WORKDIR /app
 
-COPY package.json src/ ./
+COPY package.json .
+COPY src ./src
 RUN npm install
 RUN npm run build
 
