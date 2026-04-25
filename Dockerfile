@@ -6,28 +6,20 @@ WORKDIR /app
 # Install pnpm
 RUN npm install -g pnpm@9
 
-# Copy workspace manifests
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# Copy source
+COPY package.json tsconfig.json src/ ./
 
-# Copy hyperframes packages we depend on (from monorepo subtree)
-COPY hyperframes/packages/engine/   hyperframes/packages/engine/
-COPY hyperframes/packages/producer/ hyperframes/packages/producer/
-COPY hyperframes/packages/core/    hyperframes/packages/core/
-
-# Install deps (will use workspace resolution for local packages)
+# Install deps (from npm — packages are published)
 RUN pnpm install --frozen-lockfile
 
-# Copy worker source
-COPY render-worker/ .
-
-# Build the worker
+# Build
 RUN pnpm run build
 
 
 # ── Stage 2: Runtime ─────────────────────────────────────────────────────────
 FROM node:22-bookworm-slim AS runtime
 
-# Install Chrome + FFmpeg + fonts (same as Hyperframes render image)
+# Chrome + FFmpeg + fonts (same as Hyperframes render image)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates curl unzip ffmpeg \
     libgbm1 libnss3 libatk-bridge2.0-0 libdrm2 libxcomposite1 \
@@ -40,7 +32,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && fc-cache -fv
 
-# Install Puppeteer's headless Chrome
+# Puppeteer headless Chrome
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 ENV CONTAINER=true
@@ -50,24 +42,20 @@ RUN npx --yes @puppeteer/browsers install chrome-headless-shell@stable \
 
 WORKDIR /app
 
-# Copy built worker + node_modules from builder
+# Copy built output + node_modules from builder
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 
-# Set Chrome path for BeginFrame API
+# BeginFrame Chrome path (set at runtime via shell expansion)
 ENV PRODUCER_HEADLESS_SHELL_PATH=$(find /root/.cache/puppeteer/chrome-headless-shell -name "chrome-headless-shell" -type f | head -1)
 
-# Non-root user for safety
-RUN useradd --create-home --shell /bin/bash worker
-USER worker
-
-# Render output directory (writable)
-RUN mkdir -p /tmp/renders && chown worker:worker /tmp/renders
+# Writable render output dir
+RUN mkdir -p /tmp/renders
 ENV PRODUCER_RENDERS_DIR=/tmp/renders
 
 EXPOSE 9847
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
   CMD curl -f http://localhost:9847/health || exit 1
 
 ENTRYPOINT ["node", "dist/index.js"]

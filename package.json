@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
-    "build": "tsc && tsc-alias",
+    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --format=esm --packages=external",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -17,8 +17,8 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "esbuild": "^0.24.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.7.0",
-    "typescript-route-alias": "^1.0.2"
+    "typescript": "^5.7.0"
   }
 }
