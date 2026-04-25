@@ -13,4 +13,8 @@ echo "Chrome headless shell: $PRODUCER_HEADLESS_SHELL_PATH"
 
 mkdir -p "${PRODUCER_RENDERS_DIR:-/tmp/renders}"
 
-exec node dist/index.js
+echo "Starting node dist/index.js on port ${PORT:-${RAILWAY_PUBLIC_PORT:-9847}}..."
+node dist/index.js
+EXIT_CODE=$?
+echo "FATAL: node exited with code $EXIT_CODE"
+exit $EXIT_CODE
