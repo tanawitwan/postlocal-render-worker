@@ -18,10 +18,9 @@
  *   LOG_LEVEL                         — debug | info | warn | error (default: info)
  */
 
-import { createProducerApp } from "@hyperframes/producer/server";
+import { startServer } from "@hyperframes/producer/server";
 import { createConsoleLogger } from "@hyperframes/producer";
 import { existsSync, mkdirSync } from "node:fs";
-import { join } from "node:path";
 
 const PORT = Number(process.env.PORT ?? process.env.RAILWAY_PUBLIC_PORT ?? 9847);
 const RENDERS_DIR = process.env.PRODUCER_RENDERS_DIR ?? "/tmp/renders";
@@ -44,13 +43,11 @@ logger.info("Starting @postlocal/render-worker", {
   maxConcurrent: MAX_CONCURRENT,
 });
 
-const app = createProducerApp({
+startServer({
+  port: PORT,
   logger,
   rendersDir: RENDERS_DIR,
   maxConcurrentRenders: MAX_CONCURRENT,
   outputUrlPrefix: "/outputs",
   artifactTtlMs: 60 * 60 * 1000, // 1 hour — Railway should pull the file before this
 });
-
-app.listen({ port: PORT, fetch: app.fetch });
-logger.info(`Listening on port ${PORT}`);
