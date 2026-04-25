@@ -1,0 +1,24 @@
+{
+  "name": "@postlocal/render-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc && tsc-alias",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hyperframes/engine": "^0.4.23",
+    "@hyperframes/producer": "^0.4.23",
+    "@hono/node-server": "^1.13.8",
+    "hono": "^4.7.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "typescript-route-alias": "^1.0.2"
+  }
+}
